@@ -479,11 +479,19 @@ Here is your **pointwise answer** for **Local Response Normalization (LRN)** usi
 
 ---
 
-### ⚙️ **Working of LRN**
+### ✅ **Working of Local Response Normalization (LRN) – 4 Points:**
 
-* Takes the output of a neuron and **divides it by a normalization function** that depends on the **activations of neighboring neurons**.
-* This function uses the **square of the surrounding activations** to normalize the center neuron's output.
-* Mathematically, the formula enhances strong activations and diminishes weak ones around it.
+1. **Applies Across Channels:**
+   LRN normalizes the activation of a neuron using the activations of its neighboring channels (depth-wise).
+
+2. **Suppresses Nearby Activations:**
+   Strongly activated neurons inhibit the activation of nearby neurons, creating competition.
+
+3. **Formula-Based Normalization:**
+   Each neuron’s response is divided by a factor that depends on the square sum of its neighboring neuron activations.
+
+4. **Highlights Important Features:**
+   This mechanism boosts the most relevant features and dampens less useful ones, improving model focus.
 
 ---
 
