@@ -65,17 +65,12 @@ A **discriminative model** models the **conditional probability distribution** $
 
 ### Q2.  Describe the process of building a simple Markov model for predicting the next word in a sentence with the help of example. [6]
 
-Markov Models are a type of Probabilistic Language Model.
-But not all probabilistic models are Markov models.
 
 ### **Markov Model – Explanation:**
 
-- A **Markov Model** is a statistical model that predicts future states based on the **current state only**,
+- A Markov model predicts the next state (in our case, the next word) based only on the current state (the current word). 
 - It assumes the **Markov property**:
 > *The future state depends only on the present state and not on the sequence of events that preceded it.*
-- In **Natural Language Processing (NLP)**, Markov models are used to model sequences of words or characters where the probability of a word depends on a fixed number of previous words.
-
----
 
 ### **Types of Markov Models:**
 
@@ -86,42 +81,57 @@ But not all probabilistic models are Markov models.
 ---
 
 ### **Building a Simple Markov Model (Bigram) – Step-by-Step:**
+1. **Prepare Your Training Data**: You need a corpus of text (a collection of sentences) to train your model. 
+2. **Tokenization**: Break down your training data into individual words (tokens). This usually involves splitting sentences by spaces and punctuation.
+3. **Create the Transition Probabilities**: This is the heart of the Markov model. You need to calculate the probability of each word following another word in your training data.
+4. **Represent the Model**: You can represent these transition probabilities in a data structure, such as a dictionary or a matrix.
+5. **Prediction**: To predict the next word, given a current word:
+      * Look up the current word in your model.
+      * Find the probabilities of all possible next words.
+      * You can then choose the word with the highest probability as your prediction
 
-#### **Step 1: Collect Corpus**
+#### **Step 1: Prepare Training Data**
 
 Example corpus:
 
 ```
 "I love NLP", "I love coding", "NLP is fun"
 ```
+### **Step 2: Tokenization**
 
-#### **Step 2: Build Bigram Frequencies**
+["I", "love", "NLP"]
+["I", "love", "coding"]
+["NLP", "is", "fun"]
 
-Break sentences into word pairs (bigrams):
+#### **Step 3: Transition Probabilities**
 
-* (I, love) → 2 times
-* (love, NLP) → 1 time
-* (love, coding) → 1 time
-* (NLP, is) → 1 time
-* (is, fun) → 1 time
+$$
+P(\text{word}_2 \mid \text{word}_1) = \frac{\text{Count}(\text{word}_1\ \text{word}_2)}{\text{Count}(\text{word}_1)}
+$$
 
-#### **Step 3: Calculate Probabilities**
+P("love" | "i") = Count("i love") / Count("i") = 2 / 2 = 1.0
+P("nlp" | "love") = Count("love nlp") / Count("love") = 1 / 2 = 0.5
+P("coding" | "love") = Count("love coding") / Count("love") = 1 / 2 = 0.5
+P("is" | "nlp") = Count("nlp is") / Count("nlp") = 1 / 1 = 1.0
+P("fun" | "is") = Count("is fun") / Count("is") = 1 / 1 = 1.0
 
-For word "I":
+#### **Step 4: Represent the Model**
 
-* $P(love|I) = \frac{2}{2} = 1.0$
+simple_nlp_model = {
+    "i": {"love": 1.0},
+    "love": {"nlp": 0.5, "coding": 0.5},
+    "nlp": {"is": 1.0},
+    "is": {"fun": 1.0}
+}
 
-For word "love":
-
-* $P(NLP|love) = \frac{1}{2} = 0.5$
-* $P(coding|love) = \frac{1}{2} = 0.5$
-
-#### **Step 4: Predict Next Word**
-
-If input is: **"I"** → most probable next word is **"love"**
-If input is: **"love"** → next word could be **"NLP"** or **"coding"**
+#### **Step 5: Prediction**
+* If the current word is "i": The model would predict "love" with a 100% probability.
+* If the current word is "love": The model would predict "nlp" with a 50% probability and "coding" with a 50% probability.
+* If the current word is "nlp": The model would predict "is" with a 100% probability.
+* If the current word is "is": The model would predict "fun" with a 100% probability.
 
 ---
+
 
 ### Q3.Explain Probabilistic Language Modeling
 
@@ -168,13 +178,14 @@ A **Probabilistic Language Model** assigns a **probability to a sequence of word
 
 ### Q4. Consider the following small corpus: [8]
 * Training corpus:
+```cpp
 <s> I am from Pune </s>
 <s> I am a teacher </s>
 <s> students are good and are from various cities </s>
 <s> students from Pune do engineering </s>
-
+```
 * Test data:
-<s> students are from Pune </s>
+`<s> students are from Pune </s>`
 Find the Bigram probability of the given test sentence.
 
 To calculate the **Bigram probability** of the test sentence:
@@ -401,76 +412,125 @@ $$
 ### Q6. Explain in detail Latent Semantic Analysis for topic modelling (LSA)
  Write a short note on Latent Semantic Analysis (LSA). [4]
 
-### 🔹 **Definition**
 
-**Latent Semantic Analysis (LSA)** is a mathematical and statistical technique used in Natural Language Processing (NLP) to discover hidden (latent) relationships between words and documents.
-- It reduces high-dimensional data into a lower-dimensional representation using **Singular Value Decomposition (SVD)**.
+### 🔷 What is Latent Semantic Analysis (LSA)?
 
----
+Latent Semantic Analysis (LSA), also known as **Latent Semantic Indexing (LSI)** when used in information retrieval, is an **unsupervised NLP technique** used to discover **hidden (latent) relationships between words and documents**.
 
-### 🔹 **Purpose in Topic Modeling**
-
-In topic modeling, LSA uncovers **underlying topics** from a large corpus of text by finding patterns in the usage of words across documents.
+It is based on the idea that **words that are used in similar contexts tend to have similar meanings**.
 
 ---
 
-### 🔹 **Steps in LSA for Topic Modeling**
+### 🔶 Purpose in NLP:
 
-1. **Create a Term-Document Matrix (TDM)**
-
-   * Rows: words/terms
-   * Columns: documents
-   * Cells: frequency of the word in a document (can be TF or TF-IDF)
-
-   Example:
-
-   ```
-          D1  D2  D3
-   word1   1   0   3
-   word2   2   1   0
-   word3   0   2   1
-   ```
-
-2. **Apply TF-IDF (optional but improves results)**
-   This scales down frequent but less informative words and highlights important ones.
-
-3. **Interpret Topics**
-   Each column in the reduced matrix corresponds to a **topic**, which is a set of terms with high weights.
-
-### 🔹 **Applications**
-
-* Topic detection in large text corpora
-* Document clustering and classification
-* Information retrieval
-* Query expansion in search engines
+* **Dimensionality reduction**
+* **Capturing synonymy and polysemy**
+* **Topic extraction from documents**
 
 ---
 
-### 🔹 **Example (Simplified)**
+### 🔷 Steps Involved in LSA for Topic Modelling:
 
-Let’s say we have 3 documents:
+#### ✅ 1. Text Preprocessing
 
-1. "Cats like milk"
-2. "Dogs like bones"
-3. "Cats and dogs are pets"
+* Lowercasing
+* Tokenization
+* Removing stop words
+* (Optional) Lemmatization or stemming
 
-After building a term-document matrix and applying SVD, LSA might find:
+#### ✅ 2. Create Term-Document Matrix (TDM)
 
-* **Topic 1**: cats, milk, pets
-* **Topic 2**: dogs, bones, pets
+A matrix is created where:
 
-These topics reflect the underlying themes in the corpus without explicit labeling.
+* Rows = terms (words)
+* Columns = documents
+* Values = frequency or TF-IDF scores
+
+Example:
+
+| Term / Doc | Doc1 | Doc2 | Doc3 |
+| ---------- | ---- | ---- | ---- |
+| data       | 3    | 0    | 2    |
+| mining     | 2    | 1    | 0    |
+| science    | 0    | 2    | 3    |
+
+#### ✅ 3. Apply TF-IDF (Optional but recommended)
+
+This is used to give more weight to terms that are more important in a document.
+
+* **Term Frequency (TF)** – importance in document
+* **Inverse Document Frequency (IDF)** – uniqueness across corpus
+
+#### ✅ 4. Apply **Singular Value Decomposition (SVD)**
+
+SVD allows dimensionality reduction by capturing the most important aspects of the data.
+SVD factorizes the matrix into three matrices:
+
+$$
+A \approx U \cdot \Sigma \cdot V^T
+$$
+
+Where:
+
+* **U**: term-topic matrix
+* **Σ**: singular values (importance of each topic)
+* **Vᵗ**: topic-document matrix
+
+You can reduce dimensionality by **keeping only top-k singular values**, capturing major topics.
+
+#### ✅ 5. Topic Extraction
+
+
+From the decomposed matrix:
+
+* Rows of **U** tell us which words are associated with which **topics**
+* Rows of **Vᵗ** tell us which documents are associated with which **topics**
+
+---
+
+### 🔷 Simple Example
+
+Let’s say you have 3 documents:
+
+1. “Cats are small animals.”
+2. “Dogs are friendly animals.”
+3. “Cats and dogs are pets.”
+
+LSA might identify:
+
+* Topic 1: {“cats”, “animals”, “pets”}
+* Topic 2: {“dogs”, “friendly”, “pets”}
+
+Even though “pets” may not co-occur with “friendly” directly, the latent structure reveals this link.
+
+---
+
+### 🔶 Advantages of LSA:
+
+* Captures **semantic meaning** via context
+* Handles **synonymy and polysemy**
+* Simple to implement with SVD libraries
+
+---
+
+### 🔶 Limitations:
+
+* Assumes linear relationships (no non-linearity)
+* Not probabilistic like LDA
+* Poor scalability for large corpora
+
 
 ---
 
 ### Q7. Given a document-term matrix with the following counts: [6]
 
+```
 Document 1 Document 2 Document 3
 Term 1 10 5 0
 Term 2 2 0 8
 Term 3 1 3 6
 Calculate the TF-IDF score of “Term 1” in “Document 1”.
-
+```
 Here is a complete **theory + example explanation** of **TF-IDF** and how to compute it, ideal for your **theory exam**:
 
 ---
@@ -574,52 +634,100 @@ $$
 
 ### Q8. Define Latent Dirichlet Allocation (LDA) and explain how it is used for topic modeling in text data. Discuss the key components of LDA, including topics, documents, and word distributions. [9]
 
-## ✅ **Latent Dirichlet Allocation (LDA)** – Definition and Explanation
+### 🔷 Latent Dirichlet Allocation (LDA) – Explained in Detail
 
-### 📘 **Definition:**
-
-**Latent Dirichlet Allocation (LDA)** is a **generative probabilistic model** used in **Natural Language Processing (NLP)** for **topic modeling**. It assumes that each document in a corpus is a mixture of topics, and each topic is a mixture of words.
+**Latent Dirichlet Allocation (LDA)** is a **generative probabilistic model** used for **topic modeling** — the task of discovering the abstract "topics" that occur in a collection of documents.
 
 ---
 
-## 📚 **How LDA is Used for Topic Modeling:**
+### 🔶 Key Concepts
 
-LDA helps to discover **hidden (latent) topics** in large collections of text. It groups words that frequently occur together and assigns **probabilities** of topics to each document and words to each topic.
+* **Document**: A mixture of topics.
+* **Topic**: A distribution over words.
+* **Word**: An observed word in a document.
+* **Latent**: Hidden structures (topics) are inferred from the data.
+* **Dirichlet**: A type of distribution used to represent probabilities over probabilities.
 
-For example, in a collection of news articles, LDA might identify topics like "sports", "politics", or "technology", each represented by a set of top words like:
+---
 
-* Sports → {game, team, score, win}
-* Politics → {election, party, vote, government}
+### 🔷 How LDA Works (Step-by-Step Intuition)
+
+1. **Assumptions**:
+
+   * Each document is composed of a mix of topics.
+   * Each topic is a probability distribution over words.
+
+2. **LDA Process** (Generative process):
+
+   * Choose a distribution over topics for each document (θ).
+   * For each word in the document:
+
+     * Choose a topic `z` from the topic distribution.
+     * Choose a word `w` from the selected topic’s word distribution.
+
+3. **Goal**: Reverse-engineer this process using observed words and infer:
+
+   * The topics in the corpus.
+   * Topic distribution per document.
+   * Word distribution per topic.
 
 ---
 
-## 🔑 **Key Components of LDA:**
+### 🔶 LDA Visualization
 
-### 1. **Documents:**
-
-* A document is a **collection of words** (e.g., a news article).
-* Each document is **assumed to be generated from a mixture of topics**.
-
-### 2. **Topics:**
-
-* A topic is a **distribution over words**.
-* Each topic gives **higher probabilities to some words** (e.g., “data”, “model”, “AI” for a tech topic).
-
-### 3. **Word Distributions:**
-
-* For each topic, LDA learns a **probability distribution over the vocabulary**.
-* For each document, LDA assigns **topic probabilities**.
-* For each word, LDA assumes it was generated by **first picking a topic**, then picking a word from that topic’s word distribution.
-
-
-
-## 📌 **Advantages of LDA in NLP:**
-
-* Automatically **discovers hidden topics** in documents.
-* Helps in **organizing, summarizing, and searching** large text corpora.
-* Used in **recommendation systems**, **content classification**, and **information retrieval**.
+Imagine a document as a **smoothie**, and each **fruit** in the smoothie is a word.
+The **recipe** (topic distribution) tells you what fruits (topics) are mixed in what proportions.
 
 ---
+
+### 🔷 Example
+
+#### Corpus (3 documents):
+
+1. “I love to eat broccoli and bananas.”
+2. “I ate a banana and spinach smoothie.”
+3. “Broccoli is rich in nutrients.”
+
+#### LDA Output (assuming 2 topics):
+
+* **Topic 1** (Health): broccoli, spinach, nutrients
+* **Topic 2** (Food): banana, eat, smoothie
+
+Now each document is tagged with topic probabilities:
+
+* Doc1: 40% Topic1, 60% Topic2
+* Doc2: 20% Topic1, 80% Topic2
+* Doc3: 90% Topic1, 10% Topic2
+
+---
+
+### 🔷 Applications of LDA
+
+* **Document Classification**
+* **Recommender Systems**
+* **Search Engine Optimization**
+* **Customer Feedback Analysis**
+* **News Article Clustering**
+
+---
+
+### 🔶 Advantages of LDA
+
+* **Unsupervised**: No labeled data required.
+* **Interpretable**: Topics are human-readable.
+* **Flexible**: Can be used for a variety of document collections.
+
+---
+
+### ❌ Disadvantages
+
+* Needs to predefine the number of topics (K).
+* May not capture complex semantic relationships.
+* Assumes "bag-of-words" — ignores word order.
+
+---
+
+
 
 ### Q9. What is BERT,Describe the concept of contextualized representations, such as those generated by BERT, and how they are used in natual language processing. Discuss the advantages and disadvantages of contextualized representations. [10]
 (Write short note on . [4])
@@ -649,7 +757,11 @@ But in **contextualized representations**, the meaning of a word changes dependi
 1. **Uses Transformer Architecture** – BERT is built on the Transformer encoder.
 2. **Bidirectional Attention** – It looks at **both left and right words** in a sentence at the same time.
 3. **Word Meaning Depends on Context** – Each word is represented **differently** depending on the surrounding words.
-4. **Outputs Contextual Vectors** – For each word, BERT gives a **unique vector** that captures its meaning in that specific sentence.
+4. BERT is pre-trained on two tasks:
+
+   * **Masked Language Modeling (MLM)** – Predict missing words.
+   * **Next Sentence Prediction (NSP)** – Understand sentence relationships.
+5. **Outputs Contextual Vectors** – For each word, BERT gives a **unique vector** that captures its meaning in that specific sentence.
 
 
 ## 🛠️ **Use and **Advantages of Contextualized Representations:****
